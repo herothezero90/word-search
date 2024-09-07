@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Word search game</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="wrap">
+      <h1 class="logo">Word search game</h1>
+      <section id="ws-area"></section>
+      <ul class="ws-words"></ul>
+    </div>
+    <script src="js/utility.js"></script>
+    <script src="js/wordsearch.js"></script>
+    <script type="text/javascript">
+      var gameAreaEl = document.getElementById("ws-area");
+      var gameobj = gameAreaEl.wordSearch();
+
+      // Put words into `.ws-words`
+      var words = gameobj.settings.wordsList,
+        wordsWrap = document.querySelector(".ws-words");
+      for (i in words) {
+        var liEl = document.createElement("li");
+        liEl.setAttribute("class", "ws-word");
+        liEl.innerText = words[i];
+        wordsWrap.appendChild(liEl);
+      }
+    </script>
+  </body>
+</html>
