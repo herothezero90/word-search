@@ -214,11 +214,12 @@
    * Draw the matrix
    */
   WordSearch.prototype.drawmatrix = function () {
+    this.wrapEl.innerHTML = ""; // Clear previous grid
+
     for (var row = 0; row < this.settings.gridSize; row++) {
-      // New row
       var divEl = document.createElement("div");
       divEl.setAttribute("class", "ws-row");
-      this.wrapEl.appendChild(divEl);
+      this.wrapEl.appendChild(divEl); // Create a row
 
       for (var col = 0; col < this.settings.gridSize; col++) {
         var cvEl = document.createElement("canvas");
@@ -226,7 +227,6 @@
         cvEl.setAttribute("width", 40);
         cvEl.setAttribute("height", 40);
 
-        // Fill text in middle center
         var x = cvEl.width / 2,
           y = cvEl.height / 2;
 
@@ -235,9 +235,9 @@
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#333"; // Text color
-        ctx.fillText(this.matrix[row][col].letter, x, y);
+        ctx.fillText(this.matrix[row][col].letter, x, y); // Add letter to the grid
 
-        // Add event listeners
+        // Add event listeners for both touch and mouse
         cvEl.addEventListener(
           "mousedown",
           this.onMousedown(this.matrix[row][col])
@@ -248,7 +248,20 @@
         );
         cvEl.addEventListener("mouseup", this.onMouseup());
 
-        divEl.appendChild(cvEl);
+        // Touch event listeners
+        cvEl.addEventListener(
+          "touchstart",
+          this.onMousedown(this.matrix[row][col]),
+          { passive: false }
+        );
+        cvEl.addEventListener(
+          "touchmove",
+          this.onMouseover(this.matrix[row][col]),
+          { passive: false }
+        );
+        cvEl.addEventListener("touchend", this.onMouseup(), { passive: false });
+
+        divEl.appendChild(cvEl); // Append canvas to the row
       }
     }
   };
@@ -394,7 +407,7 @@
   WordSearch.prototype.onMouseover = function (item) {
     var _this = this;
     return function (event) {
-      event.preventDefault(); // Prevent scrolling on touch devices
+      event.preventDefault(); // Prevents touch scrolling on touch devices
       if (_this.selectFrom) {
         _this.selected = _this.getItems(
           _this.selectFrom.row,
