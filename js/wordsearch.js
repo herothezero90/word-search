@@ -214,12 +214,11 @@
    * Draw the matrix
    */
   WordSearch.prototype.drawmatrix = function () {
-    this.wrapEl.innerHTML = ""; // Clear previous grid
-
     for (var row = 0; row < this.settings.gridSize; row++) {
+      // New row
       var divEl = document.createElement("div");
       divEl.setAttribute("class", "ws-row");
-      this.wrapEl.appendChild(divEl); // Create a row
+      this.wrapEl.appendChild(divEl);
 
       for (var col = 0; col < this.settings.gridSize; col++) {
         var cvEl = document.createElement("canvas");
@@ -227,6 +226,7 @@
         cvEl.setAttribute("width", 40);
         cvEl.setAttribute("height", 40);
 
+        // Fill text in middle center
         var x = cvEl.width / 2,
           y = cvEl.height / 2;
 
@@ -235,9 +235,9 @@
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#333"; // Text color
-        ctx.fillText(this.matrix[row][col].letter, x, y); // Add letter to the grid
+        ctx.fillText(this.matrix[row][col].letter, x, y);
 
-        // Add event listeners for both touch and mouse
+        // Add event listeners
         cvEl.addEventListener(
           "mousedown",
           this.onMousedown(this.matrix[row][col])
@@ -248,23 +248,11 @@
         );
         cvEl.addEventListener("mouseup", this.onMouseup());
 
-        // Touch event listeners
-        cvEl.addEventListener(
-          "touchstart",
-          this.onMousedown(this.matrix[row][col]),
-          { passive: false }
-        );
-        cvEl.addEventListener(
-          "touchmove",
-          this.onMouseover(this.matrix[row][col]),
-          { passive: false }
-        );
-        cvEl.addEventListener("touchend", this.onMouseup(), { passive: false });
-
-        divEl.appendChild(cvEl); // Append canvas to the row
+        divEl.appendChild(cvEl);
       }
     }
   };
+
   /**
    * Fill up the remaining items
    */
@@ -406,7 +394,7 @@
   WordSearch.prototype.onMouseover = function (item) {
     var _this = this;
     return function (event) {
-      event.preventDefault(); // Prevents touch scrolling
+      event.preventDefault(); // Prevent scrolling on touch devices
       if (_this.selectFrom) {
         _this.selected = _this.getItems(
           _this.selectFrom.row,
@@ -441,11 +429,30 @@
   WordSearch.prototype.onMouseup = function () {
     var _this = this;
     return function (event) {
-      event.preventDefault(); // Prevents touch scrolling
+      event.preventDefault(); // Prevent touch scrolling
       _this.selectFrom = null; // End selection
       _this.clearHighlight(); // Clear highlights
       _this.lookup(_this.selected); // Check if selected word is correct
       _this.selected = []; // Clear the selected items array
     };
+  };
+  WordSearch.prototype.addEventListeners = function () {
+    var _this = this;
+
+    document.querySelectorAll(".ws-col").forEach(function (item) {
+      // Unified touch and mouse events
+      item.addEventListener("mousedown", _this.onMousedown(item));
+      item.addEventListener("mouseover", _this.onMouseover(item));
+      item.addEventListener("mouseup", _this.onMouseup());
+
+      // Touch equivalents for touchscreens
+      item.addEventListener("touchstart", _this.onMousedown(item), {
+        passive: false,
+      });
+      item.addEventListener("touchmove", _this.onMouseover(item), {
+        passive: false,
+      });
+      item.addEventListener("touchend", _this.onMouseup(), { passive: false });
+    });
   };
 })();
