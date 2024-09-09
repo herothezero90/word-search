@@ -381,15 +381,20 @@
    */
   WordSearch.prototype.onMousedown = function (item) {
     var _this = this;
-    return function () {
+    return function (event) {
+      event.preventDefault(); // Prevent any default action (like scrolling on touch devices)
       _this.selectFrom = item;
     };
   };
 
-  /**
-   * Mouse event - Mouse move
-   * @param {Object} item
-   */
+  WordSearch.prototype.onTouchstart = function (item) {
+    var _this = this;
+    return function (event) {
+      event.preventDefault();
+      _this.selectFrom = item;
+    };
+  };
+
   WordSearch.prototype.onMouseover = function (item) {
     var _this = this;
     return function () {
@@ -421,9 +426,38 @@
     };
   };
 
-  /**
-   * Mouse event - Mouse up
-   */
+  WordSearch.prototype.onTouchmove = function (item) {
+    var _this = this;
+    return function (event) {
+      event.preventDefault(); // Prevent scrolling while touch-dragging
+      if (_this.selectFrom) {
+        _this.selected = _this.getItems(
+          _this.selectFrom.row,
+          _this.selectFrom.col,
+          item.row,
+          item.col
+        );
+
+        _this.clearHighlight();
+
+        for (var i = 0; i < _this.selected.length; i++) {
+          var current = _this.selected[i],
+            row = current.row + 1,
+            col = current.col + 1,
+            el = document.querySelector(
+              ".ws-area .ws-row:nth-child(" +
+                row +
+                ") .ws-col:nth-child(" +
+                col +
+                ")"
+            );
+
+          el.className += " ws-selected";
+        }
+      }
+    };
+  };
+
   WordSearch.prototype.onMouseup = function () {
     var _this = this;
     return function () {
@@ -433,4 +467,32 @@
       _this.selected = [];
     };
   };
-})();
+
+  WordSearch.prototype.onTouchend = function () {
+    var _this = this;
+    return function (event) {
+      event.preventDefault();
+      _this.selectFrom = null;
+      _this.clearHighlight();
+      _this.lookup(_this.selected);
+      _this.selected = [];
+    };
+  };
+
+  // Add event listeners for both mouse and touch events
+  WordSearch.prototype.addEventListeners = function () {
+    var _this = this;
+
+    document.querySelectorAll(".ws-col").forEach(function (item) {
+      // Mouse events
+      item.addEventListener("mousedown", _this.onMousedown(item));
+      item.addEventListener("mouseover", _this.onMouseover(item));
+      item.addEventListener("mouseup", _this.onMouseup());
+
+      // Touch events
+      item.addEventListener("touchstart", _this.onTouchstart(item));
+      item.addEventListener("touchmove", _this.onTouchmove(item));
+      item.addEventListener("touchend", _this.onTouchend());
+    });
+  };
+});
