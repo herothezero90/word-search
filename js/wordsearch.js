@@ -438,8 +438,7 @@
   // =========================
   WordSearch.prototype.onTouchstart = function (item) {
     var _this = this;
-    return function (event) {
-      event.preventDefault(); // Prevent touch scrolling
+    return function () {
       _this.selectFrom = item; // Start selection
     };
   };
@@ -449,8 +448,7 @@
   // =========================
   WordSearch.prototype.onTouchmove = function (item) {
     var _this = this;
-    return function (event) {
-      event.preventDefault(); // Prevent touch scrolling
+    return function () {
       if (_this.selectFrom) {
         _this.selected = _this.getItems(
           _this.selectFrom.row,
@@ -484,8 +482,7 @@
   // =========================
   WordSearch.prototype.onTouchend = function () {
     var _this = this;
-    return function (event) {
-      event.preventDefault(); // Prevent touch scrolling
+    return function () {
       _this.selectFrom = null; // End selection
       _this.clearHighlight(); // Clear highlights
       _this.lookup(_this.selected); // Process selected word
@@ -505,14 +502,10 @@
       item.addEventListener("mouseover", _this.onMouseover(item));
       item.addEventListener("mouseup", _this.onMouseup());
 
-      // Touch events (prevent scrolling)
-      item.addEventListener("touchstart", _this.onTouchstart(item), {
-        passive: false,
-      });
-      item.addEventListener("touchmove", _this.onTouchmove(item), {
-        passive: false,
-      });
-      item.addEventListener("touchend", _this.onTouchend(), { passive: false });
+      // Touch events (no need for preventDefault anymore)
+      item.addEventListener("touchstart", _this.onTouchstart(item));
+      item.addEventListener("touchmove", _this.onTouchmove(item));
+      item.addEventListener("touchend", _this.onTouchend());
     });
   };
 })();
