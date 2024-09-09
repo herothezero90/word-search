@@ -82,6 +82,7 @@ body {
 
 .ws-col {
   cursor: pointer;
+  touch-action: none;
 }
 
 .ws-col.ws-selected {
